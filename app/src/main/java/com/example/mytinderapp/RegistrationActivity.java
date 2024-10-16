@@ -55,11 +55,17 @@ public class RegistrationActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@androidx.annotation.NonNull FirebaseAuth firebaseAuth) {
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user !=null);
+                if (user != null) {
+                    Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return;
+                }
+               /* if (user !=null);
                 Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
-                return;
+                return;*/
             }
         };
 
@@ -69,12 +75,20 @@ public class RegistrationActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 int selectID = mRadioGroup.getCheckedRadioButtonId();
-                final RadioButton radioButton = (RadioButton) findViewById(selectID);
+                if (selectID == -1) {
+                    Toast.makeText(RegistrationActivity.this, "Please select a gender", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                RadioButton radioButton = (RadioButton) findViewById(selectID);
+
+                /*int selectID = mRadioGroup.getCheckedRadioButtonId();
+                final RadioButton radioButton = (RadioButton) findViewById(selectID);*/
 
                 final String email = mEmail.getText().toString();
                 final String Password = mPassword.getText().toString();
                 final String name = mName.getText().toString();
                 Log.d("RegistrationActivity", ""+selectID);
+                String gender = radioButton.getText().toString().toLowerCase();
                        if (radioButton.getText() == null) {
                         return;
                  }
@@ -87,7 +101,10 @@ public class RegistrationActivity extends AppCompatActivity {
                             String userID = mAuth.getCurrentUser().getUid();
                             DatabaseReference db=FirebaseDatabase.getInstance().getReference();
                             Log.d("REGISTRATIONACTIVITY","DatabaseID"+db);
-                            DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference().child("Users").child(radioButton.getText().toString()).child(userID).child("name");
+                            String gender = radioButton.getText().toString().toLowerCase(); // For consistency, convert to lowercase
+                            DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID).child("name");
+
+                            //DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference().child("Users").child(radioButton.getText().toString()).child(userID).child("name");
                             currentUserDb.setValue(name).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
