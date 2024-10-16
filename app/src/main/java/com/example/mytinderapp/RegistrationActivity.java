@@ -2,6 +2,7 @@ package com.example.mytinderapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,13 +11,16 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.tinderapp.R;
+
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,32 +28,19 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+
 public class RegistrationActivity extends AppCompatActivity {
 
     private Button mRegister;
-    private EditText mEmail, mPassword, mName;
+    private EditText mEmail, mPassword,mName;
     private RadioGroup mRadioGroup;
 
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener FirebaseAuthStateListener;
+    private FirebaseAuth.AuthStateListener firebaseAuthStateListener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
-
-
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@androidx.annotation.NonNull FirebaseAuth firebaseAuth) {
-                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user!= null);
-                Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-                return;
-            }
-        };
 
         mRegister = (Button) findViewById(R.id.register);
         mEmail = (EditText) findViewById(R.id.email);
@@ -58,31 +49,58 @@ public class RegistrationActivity extends AppCompatActivity {
         mRadioGroup = (RadioGroup) findViewById(R.id.radioGroup);
 
 
+
+        mAuth = FirebaseAuth.getInstance();
+        firebaseAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@androidx.annotation.NonNull FirebaseAuth firebaseAuth) {
+                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user !=null);
+                Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+                return;
+            }
+        };
+
+
         mRegister.setOnClickListener(new View.OnClickListener() {
-            int selectID = mRadioGroup.getCheckedRadioButtonId();
-            final RadioButton radioButton = (RadioButton) findViewById(selectID);
-
-
 
             @Override
             public void onClick(View view) {
+                int selectID = mRadioGroup.getCheckedRadioButtonId();
+                final RadioButton radioButton = (RadioButton) findViewById(selectID);
+
                 final String email = mEmail.getText().toString();
                 final String Password = mPassword.getText().toString();
                 final String name = mName.getText().toString();
-
-                if (radioButton.getText()== null){
-                    return;
-                }
+                Log.d("RegistrationActivity", ""+selectID);
+                       if (radioButton.getText() == null) {
+                        return;
+                 }
 
                 mAuth.createUserWithEmailAndPassword(email, Password).addOnCompleteListener(RegistrationActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@androidx.annotation.NonNull Task<AuthResult> task) {
-                        if (!task.isSuccessful()) {
-                            Toast.makeText(RegistrationActivity.this, "sign up error", Toast.LENGTH_SHORT).show();
-                        }else{
+                        if (task.isSuccessful()) {
+                            Toast.makeText(RegistrationActivity.this, "sign in Successful", Toast.LENGTH_SHORT).show();
                             String userID = mAuth.getCurrentUser().getUid();
+                            DatabaseReference db=FirebaseDatabase.getInstance().getReference();
+                            Log.d("REGISTRATIONACTIVITY","DatabaseID"+db);
                             DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference().child("Users").child(radioButton.getText().toString()).child(userID).child("name");
-                            currentUserDb.setValue(name);
+                            currentUserDb.setValue(name).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Toast.makeText(RegistrationActivity.this, "Added to Database", Toast.LENGTH_SHORT).show();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d("REGISTRATIONACTIVITY","Database error"+e);
+                                }
+                            });
+                        }else{
+                            Toast.makeText(RegistrationActivity.this, "sign up error", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

@@ -12,21 +12,21 @@
         android:id="@+id/email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="email"
+        android:hint="email"
         android:textSize="20dp" />
 
     <EditText
         android:id="@+id/password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="password"
+        android:hint="password"
         android:textSize="20dp" />
 
     <Button
         android:id="@+id/login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Login"
+        android:hint="Login"
         android:gravity="center"
         android:textSize="20dp" />
 
