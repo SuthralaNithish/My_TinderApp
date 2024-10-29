@@ -36,7 +36,7 @@ public class RegistrationActivity extends AppCompatActivity {
     private RadioGroup mRadioGroup;
 
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener firebaseAuthStateListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +51,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
 
         mAuth = FirebaseAuth.getInstance();
-        firebaseAuthStateListener = new FirebaseAuth.AuthStateListener() {
+       /* firebaseAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@androidx.annotation.NonNull FirebaseAuth firebaseAuth) {
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -61,13 +61,27 @@ public class RegistrationActivity extends AppCompatActivity {
                     finish();
                     return;
                 }
-               /* if (user !=null);
+               *//* if (user !=null);
                 Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
-                return;*/
+                return;*//*
             }
-        };
+        };*/
+
+        mAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return;
+                }
+
+            }
+        });
 
 
         mRegister.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +116,8 @@ public class RegistrationActivity extends AppCompatActivity {
                             DatabaseReference db=FirebaseDatabase.getInstance().getReference();
                             Log.d("REGISTRATIONACTIVITY","DatabaseID"+db);
                             String gender = radioButton.getText().toString().toLowerCase(); // For consistency, convert to lowercase
-                            DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference().child("Users").child(gender).child(userID).child("name");
+                            DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference("users").child(gender).child(userID).child("name");
+                            Log.d("REGISTRATIONACTIVITY","DatabaseDetail"+currentUserDb);
 
                             //DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference().child("Users").child(radioButton.getText().toString()).child(userID).child("name");
                             currentUserDb.setValue(name).addOnSuccessListener(new OnSuccessListener<Void>() {

@@ -43,6 +43,7 @@ dependencies {
     implementation ("com.lorentzos.swipecards:library:1.0.9")
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation ("androidx.cardview:cardview:1.0.0")
     implementation(libs.core.ktx)
     implementation(libs.firebase.database)
     testImplementation(libs.junit)

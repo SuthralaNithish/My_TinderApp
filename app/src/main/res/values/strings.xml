@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MyTinderApp</string>
+    <string name="user_not_defined">User Not Defined</string>
 </resources>

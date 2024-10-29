@@ -68,9 +68,12 @@ public class LoginActivity extends AppCompatActivity {
                 mAuth.signInWithEmailAndPassword (email, Password).addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@androidx.annotation.NonNull Task<AuthResult> task) {
-                        if (!task.isSuccessful()) {
+                        if (task.isSuccessful()) {
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }else {
                             Toast.makeText(LoginActivity.this, "sign in error", Toast.LENGTH_SHORT).show();
-
                         }
                     }
                 });
