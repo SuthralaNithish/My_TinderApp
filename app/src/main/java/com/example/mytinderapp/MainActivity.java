@@ -101,7 +101,10 @@ public class MainActivity extends AppCompatActivity {
                     for (DataSnapshot childSnapshot: snapshot.getChildren()){
                     Log.d("MainActivity", "" + childSnapshot);
                     String name = childSnapshot.child("name").getValue(String.class);
-                    rowItems.add(new Cards(childSnapshot.getKey(),name));
+
+                    //Cards item = new Cards(snapshot.getKey().child("name").getValue().toString(),snapshot.child("profileImageUrl").getValue().toString());
+                        Cards item = new Cards(snapshot.getKey(),snapshot.child("name").getValue().toString(),snapshot.child("profileImageUrl").getValue().toString());
+                        rowItems.add(item);
                     arrayAdapter.notifyDataSetChanged();
                 }
             }
