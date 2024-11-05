@@ -101,13 +101,17 @@ public class MainActivity extends AppCompatActivity {
                     for (DataSnapshot childSnapshot: snapshot.getChildren()){
                     Log.d("MainActivity", "" + childSnapshot);
                     String name = childSnapshot.child("name").getValue(String.class);
-
-                    //Cards item = new Cards(snapshot.getKey().child("name").getValue().toString(),snapshot.child("profileImageUrl").getValue().toString());
-                        Cards item = new Cards(snapshot.getKey(),snapshot.child("name").getValue().toString(),snapshot.child("profileImageUrl").getValue().toString());
-                        rowItems.add(item);
-                    arrayAdapter.notifyDataSetChanged();
+                        if (name != null) {
+                            Cards item = new Cards(snapshot.getKey(), name);
+                            //Cards item = new Cards(snapshot.getKey(),snapshot.child("name").getValue().toString(),snapshot.child("profileImageUrl").getValue().toString());
+                            rowItems.add(item);
+                            arrayAdapter.notifyDataSetChanged();
+                        } else {
+                            Log.d("MainActivity", "Name is null for user: " + childSnapshot.getKey());
+                        }
+                    }
                 }
-            }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
