@@ -102,8 +102,11 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("MainActivity", "" + childSnapshot);
                     String name = childSnapshot.child("name").getValue(String.class);
                         if (name != null) {
-                            Cards item = new Cards(snapshot.getKey(), name);
-                            //Cards item = new Cards(snapshot.getKey(),snapshot.child("name").getValue().toString(),snapshot.child("profileImageUrl").getValue().toString());
+                            //Cards item = new Cards(snapshot.getKey(), name);
+                            String oppositeUserId = snapshot.getKey();
+                            String profileImageUrl = childSnapshot.child("imageUrl").getValue(String.class);
+                            Cards item = new Cards(oppositeUserId, name, profileImageUrl);
+                            Log.d("MainActivity",item.getUserId());
                             rowItems.add(item);
                             arrayAdapter.notifyDataSetChanged();
                         } else {
