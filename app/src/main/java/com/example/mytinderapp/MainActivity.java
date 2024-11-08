@@ -93,8 +93,37 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void getOppositeUserSex () {
-        usersRef.child(oppositeUserSex).addListenerForSingleValueEvent(new ValueEventListener() {
+    private void getOppositeUserSex() {
+        DatabaseReference oppositeSexDb = FirebaseDatabase.getInstance().getReference().child("users").child(oppositeUserSex);
+        oppositeSexDb.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                if (snapshot.exists() && !snapshot.child("connections").child("nope").hasChild(currentUID) && !snapshot.child("connections").child("yeps").hasChild(currentUID)) {
+                    String profileImageUrl = "default";
+                    if (!snapshot.child("profileImageUrl").getValue().equals("default")) {
+                        profileImageUrl = snapshot.child("profileImageUrl").getValue().toString();
+                    }
+                    //Cards item = new Cards(snapshot.getKey(), profileImageUrl, profileImageUrl);
+                    Cards item = new Cards (snapshot.getKey(),snapshot.child("name").getValue().toString(),profileImageUrl);
+                    Log.d("MainActivity","Cards" +item);
+                    rowItems.add(item);
+                    arrayAdapter.notifyDataSetChanged();
+                }
+            }
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            }
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+       /* usersRef.child(oppositeUserSex).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists() && !snapshot.child("connections").child("nope").hasChild(currentUID) && !snapshot.child("connections").child("yeps").hasChild(currentUID))
@@ -102,9 +131,11 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("MainActivity", "" + childSnapshot);
                     String name = childSnapshot.child("name").getValue(String.class);
                         if (name != null) {
-                            //Cards item = new Cards(snapshot.getKey(), name);
-                            String oppositeUserId = snapshot.getKey();
+                            String profileImageUrl = "default";
+                            if (!snapshot.child("profileImageUrl").getValue().equals("default"))
+                                    String oppositeUserId = snapshot.getKey();
                             String profileImageUrl = childSnapshot.child("imageUrl").getValue(String.class);
+
                             Cards item = new Cards(oppositeUserId, name, profileImageUrl);
                             Log.d("MainActivity",item.getUserId());
                             rowItems.add(item);
@@ -120,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e("DB_ERROR", "Error fetching user data: " + error.getMessage());
             }
-        });
+        });*/
     }
 
 

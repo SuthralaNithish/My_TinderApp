@@ -28,6 +28,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class RegistrationActivity extends AppCompatActivity {
 
@@ -115,22 +118,14 @@ public class RegistrationActivity extends AppCompatActivity {
                             String userID = mAuth.getCurrentUser().getUid();
                             DatabaseReference db=FirebaseDatabase.getInstance().getReference();
                             Log.d("REGISTRATIONACTIVITY","DatabaseID"+db);
-                            String gender = radioButton.getText().toString().toLowerCase(); // For consistency, convert to lowercase
-                            DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference("users").child(gender).child(userID).child("name");
+                            String gender = radioButton.getText().toString().toLowerCase();
+                            DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference("users").child(gender).child(userID);
+                            Map userInfo = new HashMap<>();
+                            userInfo.put("name", name);
+                            userInfo.put("profileImageUrl","default");
                             Log.d("REGISTRATIONACTIVITY","DatabaseDetail"+currentUserDb);
+                            currentUserDb.updateChildren(userInfo);
 
-                            //DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference().child("Users").child(radioButton.getText().toString()).child(userID).child("name");
-                            currentUserDb.setValue(name).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void unused) {
-                                    Toast.makeText(RegistrationActivity.this, "Added to Database", Toast.LENGTH_SHORT).show();
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.d("REGISTRATIONACTIVITY","Database error"+e);
-                                }
-                            });
                         }else{
                             Toast.makeText(RegistrationActivity.this, "sign up error", Toast.LENGTH_SHORT).show();
                         }
