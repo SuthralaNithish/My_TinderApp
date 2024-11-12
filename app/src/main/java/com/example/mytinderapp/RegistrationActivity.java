@@ -54,24 +54,6 @@ public class RegistrationActivity extends AppCompatActivity {
 
 
         mAuth = FirebaseAuth.getInstance();
-       /* firebaseAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@androidx.annotation.NonNull FirebaseAuth firebaseAuth) {
-                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user != null) {
-                    Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                    return;
-                }
-               *//* if (user !=null);
-                Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-                return;*//*
-            }
-        };*/
-
         mAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -98,9 +80,6 @@ public class RegistrationActivity extends AppCompatActivity {
                 }
                 RadioButton radioButton = (RadioButton) findViewById(selectID);
 
-                /*int selectID = mRadioGroup.getCheckedRadioButtonId();
-                final RadioButton radioButton = (RadioButton) findViewById(selectID);*/
-
                 final String email = mEmail.getText().toString();
                 final String Password = mPassword.getText().toString();
                 final String name = mName.getText().toString();
@@ -118,10 +97,11 @@ public class RegistrationActivity extends AppCompatActivity {
                             String userID = mAuth.getCurrentUser().getUid();
                             DatabaseReference db=FirebaseDatabase.getInstance().getReference();
                             Log.d("REGISTRATIONACTIVITY","DatabaseID"+db);
-                            String gender = radioButton.getText().toString().toLowerCase();
-                            DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference("users").child(gender).child(userID);
+                            //String gender = radioButton.getText().toString().toLowerCase();
+                            DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference("users").child(userID);
                             Map userInfo = new HashMap<>();
                             userInfo.put("name", name);
+                            userInfo.put("sex",radioButton.getText().toString());
                             userInfo.put("profileImageUrl","default");
                             Log.d("REGISTRATIONACTIVITY","DatabaseDetail"+currentUserDb);
                             currentUserDb.updateChildren(userInfo);
