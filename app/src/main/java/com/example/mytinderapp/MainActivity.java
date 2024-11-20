@@ -91,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Handle potential database error here
             }
         });
     }
@@ -100,16 +99,17 @@ public class MainActivity extends AppCompatActivity {
         usersDb.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                //if (snapshot.exists() && !snapshot.child("connections").child("nope").hasChild(currentUID) && !snapshot.child("connections").child("yeps").hasChild(currentUID) && snapshot.child("sex").getValue().toString().equals(oppositeUserSex)) {
+                if (snapshot.child("sex").getValue()!= null){
                 if (snapshot.exists() && !snapshot.child("connections").child("nope").hasChild(currentUID) && !snapshot.child("connections").child("yeps").hasChild(currentUID) && snapshot.child("sex").getValue() != null && snapshot.child("sex").getValue().toString().equals(oppositeUserSex)) {
                     String profileImageUrl = "default";
                     if (snapshot.child("profileImageUrl").getValue() != null && !snapshot.child("profileImageUrl").getValue().equals("default")) {
                         profileImageUrl = snapshot.child("profileImageUrl").getValue().toString();
                     }
-                    Cards item = new Cards (snapshot.getKey(),snapshot.child("name").getValue().toString(),profileImageUrl);
-                    Log.d("MainActivity","Cards" +item);
+                    Cards item = new Cards(snapshot.getKey(), snapshot.child("name").getValue().toString(), profileImageUrl);
+                    Log.d("MainActivity", "Cards" + item);
                     rowItems.add(item);
                     arrayAdapter.notifyDataSetChanged();
+                }
                 }
             }
             @Override
@@ -186,8 +186,11 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     Toast.makeText(MainActivity.this, "new connection", Toast.LENGTH_LONG).show();
-                    usersDb.child(snapshot.getKey()).child("connections").child("matches").child(currentUID).setValue(true);
-                    usersDb.child(currentUID).child("connections").child("matches").child(snapshot.getKey()).setValue(true);
+
+                    String key = FirebaseDatabase.getInstance().getReference().child("Chat").push().getKey();
+                    usersDb.child(snapshot.getKey()).child("connections").child("matches").child(currentUID).child("chatID").setValue(key);
+                    usersDb.child(currentUID).child("connections").child("matches").child(snapshot.getKey()).child("chatID").setValue(key);
+
                 }
             }
 
