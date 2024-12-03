@@ -1,5 +1,6 @@
 package com.example.mytinderapp;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,6 +41,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +52,6 @@ public class RegistrationActivity extends AppCompatActivity {
         mPassword = (EditText) findViewById(R.id.password);
         mName = (EditText) findViewById(R.id.name);
         mRadioGroup = (RadioGroup) findViewById(R.id.radioGroup);
-
 
 
         mAuth = FirebaseAuth.getInstance();
@@ -64,55 +65,94 @@ public class RegistrationActivity extends AppCompatActivity {
                     finish();
                     return;
                 }
-
+            }
+            private boolean isValidEmail(String email) {
+                return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
             }
         });
 
 
         mRegister.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View view) {
                 int selectID = mRadioGroup.getCheckedRadioButtonId();
                 if (selectID == -1) {
-                    Toast.makeText(RegistrationActivity.this, "Please select a gender", Toast.LENGTH_SHORT).show();
+                    showErrorDialog("Please select a gender.");
                     return;
                 }
-                RadioButton radioButton = (RadioButton) findViewById(selectID);
 
-                final String email = mEmail.getText().toString();
-                final String Password = mPassword.getText().toString();
-                final String name = mName.getText().toString();
-                Log.d("RegistrationActivity", ""+selectID);
+                RadioButton radioButton = findViewById(selectID);
+                final String email = mEmail.getText().toString().trim();
+                final String password = mPassword.getText().toString();
+                final String name = mName.getText().toString().trim();
+
+                if (name.isEmpty()) {
+                    mName.setError("Name is required!");
+                    mName.requestFocus();
+                    return;
+                }
+
+                if (email.isEmpty()) {
+                    mEmail.setError("Email is required!");
+                    mEmail.requestFocus();
+                    return;
+                }
+
+                if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    mEmail.setError("Invalid email format!");
+                    mEmail.requestFocus();
+                    return;
+                }
+
+                if (password.length() < 6) {
+                    mPassword.setError("Password must be at least 6 characters long.");
+                    mPassword.requestFocus();
+                    return;
+                }
+
+                if (radioButton.getText() == null) {
+                    showErrorDialog("Please select a gender.");
+                    return;
+                }
+
                 String gender = radioButton.getText().toString().toLowerCase();
-                       if (radioButton.getText() == null) {
-                        return;
-                 }
 
-                mAuth.createUserWithEmailAndPassword(email, Password).addOnCompleteListener(RegistrationActivity.this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@androidx.annotation.NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(RegistrationActivity.this, "sign in Successful", Toast.LENGTH_SHORT).show();
-                            String userID = mAuth.getCurrentUser().getUid();
-                            DatabaseReference db=FirebaseDatabase.getInstance().getReference();
-                            Log.d("REGISTRATIONACTIVITY","DatabaseID"+db);
-                            //String gender = radioButton.getText().toString().toLowerCase();
-                            DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference("users").child(userID);
-                            Map userInfo = new HashMap<>();
-                            userInfo.put("name", name);
-                            userInfo.put("sex",radioButton.getText().toString());
-                            userInfo.put("profileImageUrl","default");
-                            Log.d("REGISTRATIONACTIVITY","DatabaseDetail"+currentUserDb);
-                            currentUserDb.updateChildren(userInfo);
+                mAuth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(RegistrationActivity.this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    String userID = mAuth.getCurrentUser().getUid();
+                                    DatabaseReference currentUserDb = FirebaseDatabase.getInstance().getReference("users").child(userID);
 
-                        }else{
-                            Toast.makeText(RegistrationActivity.this, "sign up error", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+                                    Map<String, Object> userInfo = new HashMap<>();
+                                    userInfo.put("name", name);
+                                    userInfo.put("sex", gender);
+                                    userInfo.put("profileImageUrl", "default");
+
+                                    currentUserDb.updateChildren(userInfo);
+
+                                    Toast.makeText(RegistrationActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    String errorMessage = task.getException() != null ? task.getException().getMessage() : "Sign-up failed. Please try again.";
+                                    showErrorDialog(errorMessage);
+                                }
+                            }
+                        });
             }
         });
+
+    }
+
+    private void showErrorDialog(String message) {
+        new AlertDialog.Builder(this)
+                .setTitle("Error")
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     @Override

@@ -66,7 +66,6 @@ public class MatchesActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError error) {
-
             }
         });
     }

@@ -62,12 +62,9 @@ public class MainActivity extends AppCompatActivity {
         initialization();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         currentUID = currentUser.getUid();
-        usersDb = FirebaseDatabase.getInstance().getReference().child("users");
-           checkUserSex();
-
+        checkUserSex();
 
     }
-
     private void checkUserSex() {
         usersDb.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -76,10 +73,10 @@ public class MainActivity extends AppCompatActivity {
                     String name = snapshot.child(currentUID).child("name").getValue(String.class);
                     if (snapshot.child(currentUID).child("sex").getValue() != null) {
                         userSex = snapshot.child(currentUID).child("sex").getValue().toString();
-                        if (userSex.equals("Male")) {
-                            oppositeUserSex = "Female";
-                        } else if (userSex.equals("Female")) {
-                            oppositeUserSex = "Male";
+                        if (userSex.equals("male")) {
+                            oppositeUserSex = "female";
+                        } else if (userSex.equals("female")) {
+                            oppositeUserSex = "male";
                         }
                         Toast.makeText(MainActivity.this, "User is " + userSex + ": " + name, Toast.LENGTH_SHORT).show();
                         getOppositeUserSex();
@@ -94,22 +91,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
     private void getOppositeUserSex() {
         usersDb.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 if (snapshot.child("sex").getValue()!= null){
-                if (snapshot.exists() && !snapshot.child("connections").child("nope").hasChild(currentUID) && !snapshot.child("connections").child("yeps").hasChild(currentUID) && snapshot.child("sex").getValue() != null && snapshot.child("sex").getValue().toString().equals(oppositeUserSex)) {
-                    String profileImageUrl = "default";
-                    if (snapshot.child("profileImageUrl").getValue() != null && !snapshot.child("profileImageUrl").getValue().equals("default")) {
-                        profileImageUrl = snapshot.child("profileImageUrl").getValue().toString();
+                    if (snapshot.exists() && !snapshot.child("connections").child("nope").hasChild(currentUID) && !snapshot.child("connections").child("yeps").hasChild(currentUID) && snapshot.child("sex").getValue() != null && snapshot.child("sex").getValue().toString().equals(oppositeUserSex)) {
+                        String profileImageUrl = "default";
+                        if (snapshot.child("profileImageUrl").getValue() != null && !snapshot.child("profileImageUrl").getValue().equals("default")) {
+                            profileImageUrl = snapshot.child("profileImageUrl").getValue().toString();
+                        }
+                        Cards item = new Cards(snapshot.getKey(), snapshot.child("name").getValue().toString(), profileImageUrl);
+                        Log.d("MainActivity", "Cards" + item);
+                        rowItems.add(item);
+                        arrayAdapter.notifyDataSetChanged();
                     }
-                    Cards item = new Cards(snapshot.getKey(), snapshot.child("name").getValue().toString(), profileImageUrl);
-                    Log.d("MainActivity", "Cards" + item);
-                    rowItems.add(item);
-                    arrayAdapter.notifyDataSetChanged();
-                }
                 }
             }
             @Override
@@ -127,14 +123,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
-
     private void initialization() {
-
-
         rowItems = new ArrayList<Cards>();
 
-            arrayAdapter = new arrayAdapter(this, R.layout.item, rowItems);
+        arrayAdapter = new arrayAdapter(this, R.layout.item, rowItems);
 
         SwipeFlingAdapterView flingContainer = (SwipeFlingAdapterView) findViewById(R.id.frame);
 
@@ -166,11 +158,8 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             public void onScroll(float scrollProgressPercent) {
-
             }
         });
-
-
         flingContainer.setOnItemClickListener(new SwipeFlingAdapterView.OnItemClickListener() {
             @Override
             public void onItemClicked(int itemPosition, Object dataObject) {
@@ -190,17 +179,14 @@ public class MainActivity extends AppCompatActivity {
                     String key = FirebaseDatabase.getInstance().getReference().child("Chat").push().getKey();
                     usersDb.child(snapshot.getKey()).child("connections").child("matches").child(currentUID).child("chatID").setValue(key);
                     usersDb.child(currentUID).child("connections").child("matches").child(snapshot.getKey()).child("chatID").setValue(key);
-
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
     }
-
 
     public void logoutUser(View view) {
         mAuth.signOut();
@@ -209,13 +195,11 @@ public class MainActivity extends AppCompatActivity {
         finish();
         return;
     }
-
     public void goToSettings(View view) {
         Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
         startActivity(intent);
         return;
     }
-
     public void goToMatches(View view) {
         Intent intent = new Intent(MainActivity.this, MatchesActivity.class);
         startActivity(intent);

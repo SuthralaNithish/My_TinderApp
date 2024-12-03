@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -38,7 +39,7 @@ public class ChatActivity extends AppCompatActivity {
     private RecyclerView.Adapter mChatAdapter;
     private RecyclerView.LayoutManager mChatLayoutManager;
     private EditText mSendEditText;
-    private Button mSendButton;
+    private ImageButton mSendButton;
     private String currentUserID, matchId, chatId;
 
     DatabaseReference mDatabaseUser, mDatabaseChat;
@@ -66,8 +67,9 @@ public class ChatActivity extends AppCompatActivity {
         mChatAdapter = new ChatAdapter(resultChat,ChatActivity.this);
         mRecyclerView.setAdapter(mChatAdapter);
 
-        mSendEditText = findViewById(R.id.message);
         mSendButton = findViewById(R.id.Send);
+        mSendEditText = findViewById(R.id.message);
+
 
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,9 +99,9 @@ public class ChatActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     chatId = snapshot.getValue().toString();
                     //if (chatId != null) {
-                        mDatabaseChat = mDatabaseChat.child(chatId);
-                        getChatMessages();
-                    }/* else {
+                    mDatabaseChat = mDatabaseChat.child(chatId);
+                    getChatMessages();
+                }/* else {
                         Log.e("ChatId", "Chat ID is null");
                     }
                 } else {
@@ -112,47 +114,43 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
-            private void getChatMessages() {
-                mDatabaseChat.addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
-                        if (snapshot.exists()) {
-                            String message = null;
-                            String createdByUser = null;
-                            if (snapshot.child("text").getValue()!=null){
-                                message = snapshot.child("text").getValue().toString();
-                            }
-                            if (snapshot.child("createdByUser").getValue()!=null){
-                                createdByUser = snapshot.child("createdByUser").getValue().toString();
-                            }
-                            if (message != null && createdByUser != null) {
-                                boolean currentUserBoolean = false;
-                                if (createdByUser.equals(currentUserID)){
-                                    currentUserBoolean = true;
-                                }
-                                ChatObject newMessage = new ChatObject(message, currentUserBoolean);
-                                resultChat.add(newMessage);
-                                mChatAdapter.notifyDataSetChanged();
-                            }
+    private void getChatMessages() {
+        mDatabaseChat.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
+                if (snapshot.exists()) {
+                    String message = null;
+                    String createdByUser = null;
+                    if (snapshot.child("text").getValue()!=null){
+                        message = snapshot.child("text").getValue().toString();
+                    }
+                    if (snapshot.child("createdByUser").getValue()!=null){
+                        createdByUser = snapshot.child("createdByUser").getValue().toString();
+                    }
+                    if (message != null && createdByUser != null) {
+                        boolean currentUserBoolean = false;
+                        if (createdByUser.equals(currentUserID)){
+                            currentUserBoolean = true;
                         }
+                        ChatObject newMessage = new ChatObject(message, currentUserBoolean);
+                        resultChat.add(newMessage);
+                        mChatAdapter.notifyDataSetChanged();
                     }
-                    @Override
-                    public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    }
-                    @Override
-                    public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                    }
-                    @Override
-                    public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e("ChatMessages", "Error: " + error.getMessage());
-                    }
-                });
-            };
+                }
             }
-
-
-
-
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            }
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("ChatMessages", "Error: " + error.getMessage());
+            }
+        });
+    };
+}
