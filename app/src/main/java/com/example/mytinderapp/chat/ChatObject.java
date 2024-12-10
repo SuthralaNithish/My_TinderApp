@@ -1,26 +1,41 @@
 package com.example.mytinderapp.chat;
 
 public class ChatObject {
- private String message;
- private Boolean currentUser;
-public ChatObject(String message, Boolean currentUser){
-       this.message = message;
-        this.currentUser = currentUser;
-   }
+    private String message;
+    private Boolean currentUser;
+    private String messageId;
 
-   public String getMessage() {
-    return message;
-}
-    public void setMessage (String message) {
-    this.message = message;
-}
+    public ChatObject(String message, Boolean currentUser, String messageId) {
+        this.message = message;
+        this.currentUser = currentUser;
+        this.messageId = messageId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     public Boolean getCurrentUser() {
-    return currentUser;
-}
+        return currentUser;
+    }
+
     public void setCurrentUser(Boolean currentUser) {
-    this.currentUser = currentUser;
+        this.currentUser = currentUser;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
+    }
 }
-}
+
 
 
 /*public class ChatObject {
