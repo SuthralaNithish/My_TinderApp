@@ -6,41 +6,50 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SettingsActivity"
+    android:gravity="center"
     android:orientation="vertical"
     android:padding="20sp">
 
     <ImageView
         android:id="@+id/profileImage"
-        android:layout_width="100sp"
-        android:layout_height="100sp"
-        android:layout_marginBottom="20sp"
-        android:src="@mipmap/ic_launcher" />
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="20dp"
+        android:src="@mipmap/ic_launcher"
+        android:scaleType="centerCrop" />
 
     <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/name"
-        android:background="@null"
-        android:hint="Name"
-        android:layout_marginBottom="20sp"/>
-
-    <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="Name"
+        android:padding="16dp"
+        android:textSize="16sp"/>
+
+    <EditText
         android:id="@+id/phone"
-        android:background="@null"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
         android:hint="Phone"
-        android:layout_marginBottom="20sp"
+        android:padding="16dp"
+        android:textSize="16sp"
         android:inputType="phone"/>
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/confirm"
-        android:text="CONFIRM"/>
-    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="CONFIRM"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"/>
+    <Button
         android:id="@+id/back"
-        android:text="BACK"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="BACK"
+        android:layout_marginTop="16dp"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"/>
 </LinearLayout>

@@ -1,8 +1,6 @@
 package com.example.mytinderapp.chat;
 
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -29,14 +27,14 @@ import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mChatAdapter;
+    private ChatAdapter mChatAdapter;
     private RecyclerView.LayoutManager mChatLayoutManager;
     private EditText mSendEditText;
     private ImageButton mSendButton;
     private String currentUserID, matchId, chatId;
 
     DatabaseReference mDatabaseUser, mDatabaseChat;
-    private ArrayList<ChatObject> resultChat = new ArrayList<ChatObject>();
+    private ArrayList<ChatObject> resultChat = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +52,7 @@ public class ChatActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(false);
         mChatLayoutManager = new LinearLayoutManager(ChatActivity.this);
         mRecyclerView.setLayoutManager(mChatLayoutManager);
-        mChatAdapter = new ChatAdapter(resultChat, ChatActivity.this);
+        mChatAdapter = new ChatAdapter(resultChat, ChatActivity.this, this);
         mRecyclerView.setAdapter(mChatAdapter);
 
         getChatId();
@@ -65,24 +63,24 @@ public class ChatActivity extends AppCompatActivity {
         mSendButton.setOnClickListener(view -> sendMessage());
     }
 
-   private void sendMessage() {
-       String sendMessageText = mSendEditText.getText().toString();
-       if (!sendMessageText.isEmpty()){
-           DatabaseReference newMessageDb = mDatabaseChat.push();
+    private void sendMessage() {
+        String sendMessageText = mSendEditText.getText().toString();
+        if (!sendMessageText.isEmpty()) {
+            DatabaseReference newMessageDb = mDatabaseChat.push();
 
-           Map newMessage = new HashMap();
-           newMessage.put("createdByUser", currentUserID);
-           newMessage.put("text", sendMessageText);
+            Map<String, Object> newMessage = new HashMap<>();
+            newMessage.put("createdByUser", currentUserID);
+            newMessage.put("text", sendMessageText);
 
-           newMessageDb.setValue(newMessage).addOnCompleteListener(task -> {
-               if (task.isSuccessful()) {
-                   mSendEditText.setText(null);
-               } else {
-                   Toast.makeText(ChatActivity.this, "Failed to send message.", Toast.LENGTH_SHORT).show();
-               }
-           });
-       }
-   }
+            newMessageDb.setValue(newMessage).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    mSendEditText.setText(null);
+                } else {
+                    Toast.makeText(ChatActivity.this, "Failed to send message.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
 
     private void getChatId() {
         mDatabaseUser.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -91,6 +89,7 @@ public class ChatActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     chatId = snapshot.getValue().toString();
                     mDatabaseChat = mDatabaseChat.child(chatId);
+                    mChatAdapter.setChatId(chatId);
                     getChatMessages();
                 }
             }
@@ -100,7 +99,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
-
 
     private void getChatMessages() {
         mDatabaseChat.addChildEventListener(new ChildEventListener() {
@@ -131,31 +129,43 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                String messageId = snapshot.getKey();
+                String updatedMessage = snapshot.child("text").getValue(String.class);
+                if (updatedMessage != null && messageId != null) {
+                    for (int i = 0; i < resultChat.size(); i++) {
+                        if (resultChat.get(i).getMessageId().equals(messageId)) {
+                            resultChat.get(i).setMessage(updatedMessage);
+                            mChatAdapter.notifyItemChanged(i);
+                            break;
+                        }
+                    }
+                }
             }
+
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
             }
+
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
     }
 
-    /*public void deleteMessage(String messageId) {
-        mDatabaseChat.child(messageId).removeValue()
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(ChatActivity.this, "Message deleted", Toast.LENGTH_SHORT).show();
-                    for (int i = 0; i < resultChat.size(); i++) {
-                        if (resultChat.get(i).getMessageId().equals(messageId)) {
-                            resultChat.remove(i);
-                            mChatAdapter.notifyItemRemoved(i);
-                            break;
-                        }
+    public void onMessageEdit(String messageId, String updatedMessage, int position) {
+        mDatabaseChat.child(messageId).child("text").setValue(updatedMessage)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        resultChat.get(position).setMessage(updatedMessage);
+                        mChatAdapter.notifyItemChanged(position);
+                        Toast.makeText(ChatActivity.this, "Message updated successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(ChatActivity.this, "Failed to update message", Toast.LENGTH_SHORT).show();
                     }
-                })
-                .addOnFailureListener(e -> Toast.makeText(ChatActivity.this, "Failed to delete message", Toast.LENGTH_SHORT).show());
-    }*/
+                });
+    }
 }
