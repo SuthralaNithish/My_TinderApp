@@ -28,7 +28,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private Cards cards;
-    private ArrayAdapter arrayAdapter;
+    private arrayAdapter arrayAdapter;
     private int i;
     private String userSex;
     private String oppositeUserSex;
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        initialization();
         mAuth = FirebaseAuth.getInstance();
         usersDb = FirebaseDatabase.getInstance().getReference().child("users");
 
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        initialization();
+
     }
 
     private void checkUserSex() {
@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
     private void initialization() {
         rowItems = new ArrayList<>();
 
-        arrayAdapter = new ArrayAdapter(this, R.layout.item, rowItems);
+        arrayAdapter = new arrayAdapter(this, R.layout.item, rowItems);
 
         SwipeFlingAdapterView flingContainer = findViewById(R.id.frame);
         flingContainer.setAdapter(arrayAdapter);

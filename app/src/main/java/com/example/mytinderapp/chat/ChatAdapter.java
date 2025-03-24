@@ -33,6 +33,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatViewHolder> {
     @Override
     public ChatViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View layoutView = LayoutInflater.from(context).inflate(R.layout.item_chat, null, false);
+        //View layoutView = LayoutInflater.from(context).inflate(R.layout.item_chat, viewGroup, false);
         layoutView.setLayoutParams(new RecyclerView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));

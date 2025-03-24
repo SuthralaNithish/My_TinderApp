@@ -11,8 +11,8 @@
     android:paddingTop="20sp"
     android:outlineProvider="bounds"
     android:clipToPadding="false">
-    
-    
+
+
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
